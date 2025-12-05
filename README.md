@@ -89,7 +89,7 @@ make test
 //!
 //! AUTHOR: Kevin Thomas
 //! CREATION DATE: December 4, 2025
-//! UPDATE DATE: December 4, 2025
+//! UPDATE DATE: December 5, 2025
 
 #![no_std]
 #![no_main]
@@ -102,7 +102,7 @@ use embassy_executor::Spawner;
 use embassy_rp::uart::{Config, Uart};
 use embassy_rp::{bind_interrupts, peripherals::UART0, uart::InterruptHandler};
 use panic_halt as _;
-use uart::{char_to_echo, UartController};
+use uart::UartController;
 
 bind_interrupts!(struct Irqs {
     UART0_IRQ => InterruptHandler<UART0>;
@@ -124,14 +124,15 @@ async fn main(_spawner: Spawner) {
     let p = embassy_rp::init(Default::default());
     let mut config = Config::default();
     config.baudrate = UART_BAUD_RATE;
-    let mut uart = Uart::new(p.UART0, p.PIN_0, p.PIN_1, Irqs, p.DMA_CH0, p.DMA_CH1, config);
+    let mut uart = Uart::new(
+        p.UART0, p.PIN_0, p.PIN_1, Irqs, p.DMA_CH0, p.DMA_CH1, config,
+    );
     let mut controller = UartController::new();
     let mut buf = [0u8; 1];
     loop {
         if uart.read(&mut buf).await.is_ok() {
             let echo_char = controller.process_char(buf[0]);
-            let echo_buf = [char_to_echo(echo_char)];
-            let _ = uart.write(&echo_buf).await;
+            let _ = uart.write(&[echo_char]).await;
         }
     }
 }

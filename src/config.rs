@@ -34,11 +34,11 @@
 //!
 //! BRIEF:
 //! Defines configuration constants for UART communication.
-//! Contains baud rate and buffer size configuration.
+//! Contains baud rate configuration.
 //!
 //! AUTHOR: Kevin Thomas
 //! CREATION DATE: December 4, 2025
-//! UPDATE DATE: December 4, 2025
+//! UPDATE DATE: December 5, 2025
 
 /// Default UART baud rate.
 ///
@@ -50,26 +50,6 @@
 /// 115200 baud
 pub const UART_BAUD_RATE: u32 = 115200;
 
-/// Minimum allowed UART baud rate.
-///
-/// # Details
-/// Prevents excessively slow communication rates.
-///
-/// # Value
-/// 9600 baud
-#[allow(dead_code)]
-pub const MIN_UART_BAUD_RATE: u32 = 9600;
-
-/// Maximum allowed UART baud rate.
-///
-/// # Details
-/// Prevents excessively fast communication rates for stability.
-///
-/// # Value
-/// 921600 baud
-#[allow(dead_code)]
-pub const MAX_UART_BAUD_RATE: u32 = 921600;
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -77,20 +57,5 @@ mod tests {
     #[test]
     fn test_uart_baud_rate_default() {
         assert_eq!(UART_BAUD_RATE, 115200);
-    }
-
-    #[test]
-    fn test_min_baud_rate_less_than_default() {
-        assert!(MIN_UART_BAUD_RATE < UART_BAUD_RATE);
-    }
-
-    #[test]
-    fn test_max_baud_rate_greater_than_default() {
-        assert!(MAX_UART_BAUD_RATE > UART_BAUD_RATE);
-    }
-
-    #[test]
-    fn test_baud_rate_range_valid() {
-        assert!(MIN_UART_BAUD_RATE < MAX_UART_BAUD_RATE);
     }
 }

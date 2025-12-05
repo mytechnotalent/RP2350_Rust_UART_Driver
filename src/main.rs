@@ -38,7 +38,7 @@
 //!
 //! AUTHOR: Kevin Thomas
 //! CREATION DATE: December 4, 2025
-//! UPDATE DATE: December 4, 2025
+//! UPDATE DATE: December 5, 2025
 
 #![no_std]
 #![no_main]
@@ -51,7 +51,7 @@ use embassy_executor::Spawner;
 use embassy_rp::uart::{Config, Uart};
 use embassy_rp::{bind_interrupts, peripherals::UART0, uart::InterruptHandler};
 use panic_halt as _;
-use uart::{char_to_echo, UartController};
+use uart::UartController;
 
 bind_interrupts!(struct Irqs {
     UART0_IRQ => InterruptHandler<UART0>;
@@ -81,8 +81,7 @@ async fn main(_spawner: Spawner) {
     loop {
         if uart.read(&mut buf).await.is_ok() {
             let echo_char = controller.process_char(buf[0]);
-            let echo_buf = [char_to_echo(echo_char)];
-            let _ = uart.write(&echo_buf).await;
+            let _ = uart.write(&[echo_char]).await;
         }
     }
 }
