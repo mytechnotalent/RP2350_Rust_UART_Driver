@@ -30,7 +30,7 @@
 .PHONY: test build clean flash
 
 test:
-	cargo test --lib --target aarch64-apple-darwin --no-default-features
+	cargo test --lib --target $(shell rustc --print host-tuple) --no-default-features
 
 build:
 	cargo build --release

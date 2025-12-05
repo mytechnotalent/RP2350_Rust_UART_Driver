@@ -158,6 +158,7 @@ impl UartController {
     ///
     /// # Returns
     /// * `u32` - Baud rate
+    #[allow(dead_code)]
     pub fn baud_rate(&self) -> u32 {
         self.baud_rate
     }
