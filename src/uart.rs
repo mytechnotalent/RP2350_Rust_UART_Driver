@@ -40,11 +40,20 @@
 //! CREATION DATE: December 4, 2025
 //! UPDATE DATE: December 5, 2025
 
+/// Backspace character code.
+const BACKSPACE: u8 = 0x08;
+
+/// Delete character code.
+const DELETE: u8 = 0x7F;
+
+/// Backspace erase sequence: backspace, space, backspace.
+const BACKSPACE_SEQ: [u8; 3] = [0x08, b' ', 0x08];
+
 /// UART controller with echo tracking.
 ///
 /// # Details
 /// Maintains UART echo count for statistics.
-/// Provides methods for character processing.
+/// Provides methods for character processing with backspace support.
 ///
 /// # Fields
 /// * `echo_count` - Number of characters echoed
@@ -79,19 +88,74 @@ impl UartController {
         Self { echo_count: 0 }
     }
 
-    /// Processes a received character and prepares for echo.
+    /// Processes a received character and returns echo response.
     ///
     /// # Details
-    /// Increments echo count and returns character for echo.
+    /// Handles backspace by returning erase sequence.
+    /// Normal characters are echoed as-is.
     ///
     /// # Arguments
     /// * `ch` - The character received
     ///
     /// # Returns
-    /// * `u8` - The character to echo back
-    pub fn process_char(&mut self, ch: u8) -> u8 {
+    /// * `&'static [u8]` - Bytes to echo back
+    pub fn process_char(&mut self, ch: u8) -> &'static [u8] {
         self.echo_count += 1;
-        ch
+        if ch == BACKSPACE || ch == DELETE {
+            &BACKSPACE_SEQ
+        } else {
+            match ch {
+                b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' => {
+                    static CHARS: [u8; 62] = [
+                        b'A', b'B', b'C', b'D', b'E', b'F', b'G', b'H', b'I', b'J', b'K', b'L',
+                        b'M', b'N', b'O', b'P', b'Q', b'R', b'S', b'T', b'U', b'V', b'W', b'X',
+                        b'Y', b'Z', b'a', b'b', b'c', b'd', b'e', b'f', b'g', b'h', b'i', b'j',
+                        b'k', b'l', b'm', b'n', b'o', b'p', b'q', b'r', b's', b't', b'u', b'v',
+                        b'w', b'x', b'y', b'z', b'0', b'1', b'2', b'3', b'4', b'5', b'6', b'7',
+                        b'8', b'9',
+                    ];
+                    let idx = CHARS.iter().position(|&c| c == ch).unwrap();
+                    &CHARS[idx..idx + 1]
+                }
+                b' ' => b" ",
+                b'!' => b"!",
+                b'"' => b"\"",
+                b'#' => b"#",
+                b'$' => b"$",
+                b'%' => b"%",
+                b'&' => b"&",
+                b'\'' => b"\'",
+                b'(' => b"(",
+                b')' => b")",
+                b'*' => b"*",
+                b'+' => b"+",
+                b',' => b",",
+                b'-' => b"-",
+                b'.' => b".",
+                b'/' => b"/",
+                b':' => b":",
+                b';' => b";",
+                b'<' => b"<",
+                b'=' => b"=",
+                b'>' => b">",
+                b'?' => b"?",
+                b'@' => b"@",
+                b'[' => b"[",
+                b'\\' => b"\\",
+                b']' => b"]",
+                b'^' => b"^",
+                b'_' => b"_",
+                b'`' => b"`",
+                b'{' => b"{",
+                b'|' => b"|",
+                b'}' => b"}",
+                b'~' => b"~",
+                b'\n' => b"\n",
+                b'\r' => b"\r",
+                b'\t' => b"\t",
+                _ => b"",
+            }
+        }
     }
 
     /// Returns total echo count.
@@ -128,7 +192,7 @@ mod tests {
     #[test]
     fn test_process_char_returns_same() {
         let mut ctrl = UartController::new();
-        assert_eq!(ctrl.process_char(b'A'), b'A');
+        assert_eq!(ctrl.process_char(b'A'), b"A");
     }
 
     #[test]
@@ -143,7 +207,19 @@ mod tests {
     #[test]
     fn test_process_char_special() {
         let mut ctrl = UartController::new();
-        assert_eq!(ctrl.process_char(b'\n'), b'\n');
-        assert_eq!(ctrl.process_char(b'\r'), b'\r');
+        assert_eq!(ctrl.process_char(b'\n'), b"\n");
+        assert_eq!(ctrl.process_char(b'\r'), b"\r");
+    }
+
+    #[test]
+    fn test_process_backspace() {
+        let mut ctrl = UartController::new();
+        assert_eq!(ctrl.process_char(0x08), &[0x08, b' ', 0x08]);
+    }
+
+    #[test]
+    fn test_process_delete() {
+        let mut ctrl = UartController::new();
+        assert_eq!(ctrl.process_char(0x7F), &[0x08, b' ', 0x08]);
     }
 }

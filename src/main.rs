@@ -80,8 +80,8 @@ async fn main(_spawner: Spawner) {
     let mut buf = [0u8; 1];
     loop {
         if uart.read(&mut buf).await.is_ok() {
-            let echo_char = controller.process_char(buf[0]);
-            let _ = uart.write(&[echo_char]).await;
+            let echo_bytes = controller.process_char(buf[0]);
+            let _ = uart.write(echo_bytes).await;
         }
     }
 }
