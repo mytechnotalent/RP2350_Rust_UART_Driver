@@ -58,6 +58,7 @@ pub const UART_BAUD_RATE: u32 = 115200;
 ///
 /// # Value
 /// 0x08
+#[allow(dead_code)]
 pub const BACKSPACE: u8 = 0x08;
 
 /// Delete character code.
@@ -67,6 +68,7 @@ pub const BACKSPACE: u8 = 0x08;
 ///
 /// # Value
 /// 0x7F
+#[allow(dead_code)]
 pub const DELETE: u8 = 0x7F;
 
 /// Backspace erase sequence: backspace, space, backspace.
@@ -76,6 +78,7 @@ pub const DELETE: u8 = 0x7F;
 ///
 /// # Value
 /// [0x08, b' ', 0x08]
+#[allow(dead_code)]
 pub const BACKSPACE_SEQ: [u8; 3] = [0x08, b' ', 0x08];
 
 #[cfg(test)]
