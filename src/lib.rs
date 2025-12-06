@@ -41,6 +41,5 @@
 //! UPDATE DATE: December 4, 2025
 
 #![cfg_attr(not(test), no_std)]
-
 pub mod config;
 pub mod uart;

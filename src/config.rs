@@ -34,7 +34,7 @@
 //!
 //! BRIEF:
 //! Defines configuration constants for UART communication.
-//! Contains baud rate configuration.
+//! Contains baud rate and control character configuration.
 //!
 //! AUTHOR: Kevin Thomas
 //! CREATION DATE: December 4, 2025
@@ -48,14 +48,94 @@
 ///
 /// # Value
 /// 115200 baud
+#[allow(dead_code)]
 pub const UART_BAUD_RATE: u32 = 115200;
+
+/// Backspace character code.
+///
+/// # Details
+/// Typical backspace control sent by terminals.
+///
+/// # Value
+/// 0x08
+pub const BACKSPACE: u8 = 0x08;
+
+/// Delete character code.
+///
+/// # Details
+/// Some terminals send DEL (0x7F) for backspace.
+///
+/// # Value
+/// 0x7F
+pub const DELETE: u8 = 0x7F;
+
+/// Backspace erase sequence: backspace, space, backspace.
+///
+/// # Details
+/// When echoed to a terminal this sequence erases the previous character.
+///
+/// # Value
+/// [0x08, b' ', 0x08]
+pub const BACKSPACE_SEQ: [u8; 3] = [0x08, b' ', 0x08];
 
 #[cfg(test)]
 mod tests {
     use super::*;
 
+    // ==================== UART Configuration Tests ====================
+
     #[test]
     fn test_uart_baud_rate_default() {
         assert_eq!(UART_BAUD_RATE, 115200);
+    }
+
+    #[test]
+    fn test_backspace_value() {
+        assert_eq!(BACKSPACE, 0x08);
+    }
+
+    #[test]
+    fn test_delete_value() {
+        assert_eq!(DELETE, 0x7F);
+    }
+
+    #[test]
+    fn test_backspace_seq_length() {
+        assert_eq!(BACKSPACE_SEQ.len(), 3);
+    }
+
+    #[test]
+    fn test_backspace_seq_first_byte() {
+        assert_eq!(BACKSPACE_SEQ[0], 0x08);
+    }
+
+    #[test]
+    fn test_backspace_seq_middle_byte() {
+        assert_eq!(BACKSPACE_SEQ[1], b' ');
+    }
+
+    #[test]
+    fn test_backspace_seq_last_byte() {
+        assert_eq!(BACKSPACE_SEQ[2], 0x08);
+    }
+
+    #[test]
+    fn test_backspace_not_delete() {
+        assert_ne!(BACKSPACE, DELETE);
+    }
+
+    #[test]
+    fn test_backspace_seq_contains_backspace() {
+        assert!(BACKSPACE_SEQ.contains(&BACKSPACE));
+    }
+
+    #[test]
+    fn test_backspace_seq_contains_space() {
+        assert!(BACKSPACE_SEQ.contains(&b' '));
+    }
+
+    #[test]
+    fn test_backspace_seq_full() {
+        assert_eq!(BACKSPACE_SEQ, [0x08, b' ', 0x08]);
     }
 }
